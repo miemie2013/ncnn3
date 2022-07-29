@@ -134,6 +134,28 @@ x.requires_grad_(False)
 y = model(x)
 
 
+
+import torch.nn as nn
+import torchvision
+
+class Model(nn.Module):
+    def __init__(self):
+        super(Model, self).__init__()
+
+        self.conv_0 = nn.Conv2d(in_channels=12, out_channels=3*3*3, kernel_size=3)
+        self.conv_1 = torchvision.ops.DeformConv2d(in_channels=12, out_channels=16, kernel_size=3)
+
+    def forward(self, x):
+        offset_mask = self.conv_0(x)
+        offset = offset_mask[:, :2*3*3, :, :]
+        mask = offset_mask[:, 2*3*3:, :, :]
+        mask = torch.sigmoid(mask)
+        x = self.conv_1(x, offset, mask)
+        return x
+
+aaaaaaaaaa = Model()
+yyyyyyyyyyy = aaaaaaaaaa(x)
+
 dic = {}
 dic['x'] = x.cpu().detach().numpy()
 dic['y'] = y[-1].cpu().detach().numpy()
