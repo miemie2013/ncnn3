@@ -13,7 +13,7 @@
 // specific language governing permissions and limitations under the License.
 
 #include "convolution_x86.h"
-
+#include <iostream>
 #if __SSE2__
 #include <emmintrin.h>
 #if __SSE4_1__
@@ -31,6 +31,21 @@
 #include "layer_type.h"
 
 namespace ncnn {
+
+
+static void ppppp(const ncnn::Mat& m, const char* name)
+{
+    int dims = m.dims;
+    int C = m.c;
+    int D = m.d;
+    int H = m.h;
+    int W = m.w;
+    size_t elemsize = m.elemsize;
+    int elempack = m.elempack;
+    size_t cstep = m.cstep;
+    printf("%s shape dims=%d, C=%d, D=%d, H=%d, W=%d, elemsize=%d, elempack=%d, cstep=%d\n", name, dims, C, D, H, W, (int)elemsize, elempack, (int)cstep);
+}
+
 
 #include "convolution_sgemm.h"
 #include "convolution_winograd_transform.h"
@@ -737,6 +752,8 @@ int Convolution_x86::destroy_pipeline(const Option& opt)
 
 int Convolution_x86::forward(const Mat& bottom_blob, Mat& top_blob, const Option& opt) const
 {
+    printf("-------------- Convolution_x86 --------------\n");
+    std::cout << this->name << std::endl;
 #if NCNN_INT8
     if (opt.use_int8_inference && int8_scale_term)
     {
@@ -747,6 +764,7 @@ int Convolution_x86::forward(const Mat& bottom_blob, Mat& top_blob, const Option
     // flattened blob, implement as InnerProduct
     if (bottom_blob.dims == 1 && kernel_w == 1 && kernel_h == 1)
     {
+        printf("-------------- dddddddddddddddddddd==1 --------------\n");
         Mat bottom_blob_3d;
         if (bottom_blob.elemsize % 16 == 0)
         {
@@ -789,6 +807,8 @@ int Convolution_x86::forward(const Mat& bottom_blob, Mat& top_blob, const Option
     int channels = bottom_blob.c;
     size_t elemsize = bottom_blob.elemsize;
     int elempack = bottom_blob.elempack;
+    printf("elempack=%d\n", elempack);
+    ppppp(bottom_blob, "bottom_blob");
 
     const int kernel_extent_w = dilation_w * (kernel_w - 1) + 1;
     const int kernel_extent_h = dilation_h * (kernel_h - 1) + 1;
@@ -805,14 +825,20 @@ int Convolution_x86::forward(const Mat& bottom_blob, Mat& top_blob, const Option
     int outh = (h - kernel_extent_h) / stride_h + 1;
     int out_elempack = 1;
 #if __SSE2__
+    printf("-------------- __SSE2__ --------------\n");
     if (opt.use_packing_layout)
     {
 #if __AVX512F__
+        printf("-------------- __AVX512F__ --------------\n");
         out_elempack = num_output % 16 == 0 ? 16 : num_output % 8 == 0 ? 8 : num_output % 4 == 0 ? 4 : 1;
+        printf("out_elempack=%d\n", out_elempack);
 #elif __AVX__
+        printf("-------------- __AVX__ --------------\n");
         out_elempack = num_output % 8 == 0 ? 8 : num_output % 4 == 0 ? 4 : 1;
+        printf("out_elempack=%d\n", out_elempack);
 #else
         out_elempack = num_output % 4 == 0 ? 4 : 1;
+        printf("out_elempack=%d\n", out_elempack);
 #endif
     }
 #endif // __SSE2__
@@ -1115,6 +1141,7 @@ int Convolution_x86::forward(const Mat& bottom_blob, Mat& top_blob, const Option
 
     if (elempack == 8 && out_elempack == 8)
     {
+        printf("-------------- 8to8 --------------\n");
         if (kernel_w == 1 && kernel_h == 1 && dilation_w == 1 && dilation_h == 1 && stride_w == 1 && stride_h == 1)
         {
             conv1x1s1_sgemm_pack8_avx(bottom_blob_bordered, top_blob, weight_sgemm_data, bias_data, opt);
@@ -1135,13 +1162,16 @@ int Convolution_x86::forward(const Mat& bottom_blob, Mat& top_blob, const Option
         }
         else if (opt.use_winograd_convolution && (opt.use_winograd23_convolution || opt.use_winograd43_convolution || opt.use_winograd63_convolution) && kernel_w == 3 && kernel_h == 3 && dilation_w == 1 && dilation_h == 1 && stride_w == 1 && stride_h == 1 && (num_input > 8 || num_output > 8))
         {
-            if ((opt.use_winograd63_convolution && num_input >= 16 && num_output >= 16 && num_input <= 64 && num_output <= 64) || (!opt.use_winograd43_convolution && !opt.use_winograd23_convolution))
+            if ((opt.use_winograd63_convolution && num_input >= 16 && num_output >= 16 && num_input <= 64 && num_output <= 64) || (!opt.use_winograd43_convolution && !opt.use_winograd23_convolution)) {
+                printf("-------------- conv3x3s1_winograd63_pack8_avx --------------\n");
                 conv3x3s1_winograd63_pack8_avx(bottom_blob_bordered, top_blob, weight_winograd63_data, bias_data, opt);
-            else if ((opt.use_winograd43_convolution && num_input >= 16 && num_output >= 16) || (!opt.use_winograd63_convolution && !opt.use_winograd23_convolution))
+            }else if ((opt.use_winograd43_convolution && num_input >= 16 && num_output >= 16) || (!opt.use_winograd63_convolution && !opt.use_winograd23_convolution)) {
+                printf("-------------- conv3x3s1_winograd43_pack8_avx --------------\n");
                 conv3x3s1_winograd43_pack8_avx(bottom_blob_bordered, top_blob, weight_winograd43_data, bias_data, opt);
-            else // if (opt.use_winograd23_convolution)
+            }else { // if (opt.use_winograd23_convolution)
+                printf("-------------- conv3x3s1_winograd23_pack8_avx --------------\n");
                 conv3x3s1_winograd23_pack8_avx(bottom_blob_bordered, top_blob, weight_winograd23_data, bias_data, opt);
-
+            }
             if (activation)
             {
                 activation->forward_inplace(top_blob, opt);
@@ -1182,6 +1212,7 @@ int Convolution_x86::forward(const Mat& bottom_blob, Mat& top_blob, const Option
 
     if (elempack == 1 && out_elempack == 8)
     {
+        printf("-------------- 1to8 --------------\n");
         if (kernel_w == 1 && kernel_h == 1 && dilation_w == 1 && dilation_h == 1 && stride_w == 1 && stride_h == 1)
         {
             conv1x1s1_sgemm_pack1to8_avx(bottom_blob_bordered, top_blob, weight_sgemm_data, bias_data, opt);
@@ -1211,6 +1242,7 @@ int Convolution_x86::forward(const Mat& bottom_blob, Mat& top_blob, const Option
         }
         else if (kernel_w == 3 && kernel_h == 3 && dilation_w == 1 && dilation_h == 1 && stride_w == 2 && stride_h == 2)
         {
+            printf("-------------- conv3x3s2_pack1to8_avx --------------\n");
             conv3x3s2_pack1to8_avx(bottom_blob_bordered, top_blob, weight_data_tm, bias_data, opt);
 
             if (activation)
