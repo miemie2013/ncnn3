@@ -394,7 +394,7 @@ int DeformableConv2D_x86::forward(const std::vector<Mat>& bottom_blobs, std::vec
         printf("-------------- 1to8 --------------\n");
         if (opt.use_sgemm_convolution)
         {
-            // from aaaaaaaaaaaaa
+            // from src/layer/x86/deformableconv2d_sgemm_pack1to8.h
             deformableconv2d_im2col_sgemm_pack1to8_avx(bottom_blob_bordered, top_blob, weight_sgemm_data, bias_data, kernel_w, kernel_h, dilation_w, dilation_h, stride_w, stride_h, opt);
 
             if (activation)
@@ -404,7 +404,7 @@ int DeformableConv2D_x86::forward(const std::vector<Mat>& bottom_blobs, std::vec
         }
         else
         {
-            // from aaaaaaaaaaaaa
+            // from src/layer/x86/deformableconv2d_pack1to8.h
             deformableconv2d_pack1to8_avx(bottom_blob_bordered, top_blob, weight_data_tm, bias_data, kernel_w, kernel_h, dilation_w, dilation_h, stride_w, stride_h, activation_type, activation_params, opt);
         }
     }
@@ -413,7 +413,7 @@ int DeformableConv2D_x86::forward(const std::vector<Mat>& bottom_blobs, std::vec
     {
         if (opt.use_sgemm_convolution)
         {
-            // from aaaaaaaaaaaaa
+            // from src/layer/x86/deformableconv2d_sgemm_pack4to8.h
             deformableconv2d_im2col_sgemm_pack4to8_avx(bottom_blob_bordered, top_blob, weight_sgemm_data, bias_data, kernel_w, kernel_h, dilation_w, dilation_h, stride_w, stride_h, opt);
 
             if (activation)
@@ -423,7 +423,7 @@ int DeformableConv2D_x86::forward(const std::vector<Mat>& bottom_blobs, std::vec
         }
         else
         {
-            // from aaaaaaaaaaaaa
+            // from src/layer/x86/deformableconv2d_pack4to8.h
             deformableconv2d_pack4to8_avx(bottom_blob_bordered, top_blob, weight_data_tm, bias_data, kernel_w, kernel_h, dilation_w, dilation_h, stride_w, stride_h, activation_type, activation_params, opt);
         }
     }
@@ -432,7 +432,7 @@ int DeformableConv2D_x86::forward(const std::vector<Mat>& bottom_blobs, std::vec
     {
         if (opt.use_sgemm_convolution)
         {
-            // from aaaaaaaaaaaaa
+            // from src/layer/x86/deformableconv2d_sgemm_pack8to1.h
             deformableconv2d_im2col_sgemm_pack8to1_avx(bottom_blob_bordered, top_blob, weight_sgemm_data, bias_data, kernel_w, kernel_h, dilation_w, dilation_h, stride_w, stride_h, opt);
 
             if (activation)
@@ -442,7 +442,7 @@ int DeformableConv2D_x86::forward(const std::vector<Mat>& bottom_blobs, std::vec
         }
         else
         {
-            // from aaaaaaaaaaaaa
+            // from src/layer/x86/deformableconv2d_pack8to1.h
             deformableconv2d_pack8to1_avx(bottom_blob_bordered, top_blob, weight_data_tm, bias_data, kernel_w, kernel_h, dilation_w, dilation_h, stride_w, stride_h, activation_type, activation_params, opt);
         }
     }
@@ -451,7 +451,7 @@ int DeformableConv2D_x86::forward(const std::vector<Mat>& bottom_blobs, std::vec
     {
         if (opt.use_sgemm_convolution)
         {
-            // from aaaaaaaaaaaaa
+            // from src/layer/x86/deformableconv2d_sgemm_pack8to4.h
             deformableconv2d_im2col_sgemm_pack8to4_avx(bottom_blob_bordered, top_blob, weight_sgemm_data, bias_data, kernel_w, kernel_h, dilation_w, dilation_h, stride_w, stride_h, opt);
 
             if (activation)
@@ -461,7 +461,7 @@ int DeformableConv2D_x86::forward(const std::vector<Mat>& bottom_blobs, std::vec
         }
         else
         {
-            // from aaaaaaaaaaaaa
+            // from src/layer/x86/deformableconv2d_pack8to4.h
             deformableconv2d_pack8to4_avx(bottom_blob_bordered, top_blob, weight_data_tm, bias_data, kernel_w, kernel_h, dilation_w, dilation_h, stride_w, stride_h, activation_type, activation_params, opt);
         }
     }
@@ -475,7 +475,7 @@ int DeformableConv2D_x86::forward(const std::vector<Mat>& bottom_blobs, std::vec
 
         if (opt.use_sgemm_convolution && prefer_sgemm)
         {
-            // from aaaaaaaaaaaaa
+            // from src/layer/x86/deformableconv2d_sgemm_pack4.h
             deformableconv2d_im2col_sgemm_pack4_sse(bottom_blob_bordered, top_blob, weight_sgemm_data, bias_data, kernel_w, kernel_h, dilation_w, dilation_h, stride_w, stride_h, opt);
 
             if (activation)
@@ -485,7 +485,7 @@ int DeformableConv2D_x86::forward(const std::vector<Mat>& bottom_blobs, std::vec
         }
         else
         {
-            // from aaaaaaaaaaaaa
+            // from src/layer/x86/deformableconv2d_pack4.h
             deformableconv2d_pack4_sse(bottom_blob_bordered, top_blob, weight_data_tm, bias_data, kernel_w, kernel_h, dilation_w, dilation_h, stride_w, stride_h, activation_type, activation_params, opt);
         }
     }
@@ -498,7 +498,7 @@ int DeformableConv2D_x86::forward(const std::vector<Mat>& bottom_blobs, std::vec
 
         if (opt.use_sgemm_convolution && prefer_sgemm)
         {
-            // from aaaaaaaaaaaaa
+            // from src/layer/x86/deformableconv2d_sgemm_pack1to4.h
             deformableconv2d_im2col_sgemm_pack1to4_sse(bottom_blob_bordered, top_blob, weight_sgemm_data, bias_data, kernel_w, kernel_h, dilation_w, dilation_h, stride_w, stride_h, opt);
 
             if (activation)
@@ -508,7 +508,7 @@ int DeformableConv2D_x86::forward(const std::vector<Mat>& bottom_blobs, std::vec
         }
         else
         {
-            // from aaaaaaaaaaaaa
+            // from src/layer/x86/deformableconv2d_pack1to4.h
             deformableconv2d_pack1to4_sse(bottom_blob_bordered, top_blob, weight_data_tm, bias_data, kernel_w, kernel_h, dilation_w, dilation_h, stride_w, stride_h, activation_type, activation_params, opt);
         }
     }
@@ -521,7 +521,7 @@ int DeformableConv2D_x86::forward(const std::vector<Mat>& bottom_blobs, std::vec
 
         if (opt.use_sgemm_convolution && prefer_sgemm)
         {
-            // from aaaaaaaaaaaaa
+            // from src/layer/x86/deformableconv2d_sgemm_pack4to1.h
             deformableconv2d_im2col_sgemm_pack4to1_sse(bottom_blob_bordered, top_blob, weight_sgemm_data, bias_data, kernel_w, kernel_h, dilation_w, dilation_h, stride_w, stride_h, opt);
 
             if (activation)
@@ -531,7 +531,7 @@ int DeformableConv2D_x86::forward(const std::vector<Mat>& bottom_blobs, std::vec
         }
         else
         {
-            // from aaaaaaaaaaaaa
+            // from src/layer/x86/deformableconv2d_pack4to1.h
             deformableconv2d_pack4to1_sse(bottom_blob_bordered, top_blob, weight_data_tm, bias_data, kernel_w, kernel_h, dilation_w, dilation_h, stride_w, stride_h, activation_type, activation_params, opt);
         }
     }
@@ -541,7 +541,7 @@ int DeformableConv2D_x86::forward(const std::vector<Mat>& bottom_blobs, std::vec
     {
         if (opt.use_sgemm_convolution)
         {
-            // from aaaaaaaaaaaaa
+            // from src/layer/x86/deformableconv2d_sgemm.h
             deformableconv2d_im2col_sgemm_sse(bottom_blob_bordered, top_blob, weight_sgemm_data, bias_data, kernel_w, kernel_h, dilation_w, dilation_h, stride_w, stride_h, opt);
 
             if (activation)
